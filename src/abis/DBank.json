@@ -6011,12 +6011,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xA4c45e4dFd587bd5F96650CEc50Df37e94d72FA0",
-      "transactionHash": "0x247ab325bd7fa03fc7cb20336448449a0877ad49d4f5def2421b13fc7cd972f4"
+      "address": "0xF4eDdb64f2a107f90365a586105d6e19690f0D41",
+      "transactionHash": "0x98e6867c97067dec27a557c96f83aa47c54b3afd681ec596296df3d556fa0bbd"
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2022-05-31T22:04:17.132Z",
+  "updatedAt": "2022-06-01T13:15:18.721Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

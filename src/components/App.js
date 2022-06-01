@@ -6,67 +6,68 @@ import Web3 from "web3";
 import bankImage from "../bank.png";
 import { Button, Row } from "react-bootstrap";
 import TetherTokenAbi from "../abis/TetherToken.json";
+import RewardTokenAbi from "../abis/RewardToken.json";
+import DBankAbi from "../abis/DBank.json";
 
 const App = (props) => {
-  const [web3, setWeb3] = useState();
-  const [account, setAccount] = useState("0x0");
-  const [tetherTokenContract, setTetherTokenContract] = useState({});
+  const [account, setAccount] = useState(null);
+  const [tetherTokenContract, setTetherTokenContract] = useState(null);
   const [tetherBalance, setTetherBalance] = useState(0);
   const [rewardTokenContract, setRewardTokenContract] = useState({});
   const [dBankContract, setDBankContract] = useState({});
   const [stakingBalance, setStakingBalance] = useState(0);
   const [loading, setLoading] = useState(false);
+  const web3 = new Web3(Web3.givenProvider);
 
-  const loadWeb3 = async () => {
-    if (!window.ethereum && !window.web3) {
-      window.alert("No Ethereum browser detected. Install Metamask.");
+  useEffect(() => {
+    const loadAccount = async () => {
+      const web3Accounts = await web3.eth.getAccounts();
+      console.log(web3Accounts);
+      setAccount(web3Accounts[0]);
+    };
+
+    const loadBlockchainData = async () => {
+      const networkId = await web3.eth.net.getId();
+      const tetherNetworkData = TetherTokenAbi.networks[networkId];
+      console.log("token network ID: ", networkId);
+
+      //load Tether contract
+      if (tetherNetworkData) {
+        const tetherContract = new web3.eth.Contract(
+          TetherTokenAbi.abi,
+          tetherNetworkData.address
+        );
+        setTetherTokenContract(tetherContract);
+      } else {
+        window.alert(
+          "Error - Tether contract not deployed - no network detected"
+        );
+      }
+    };
+
+    loadAccount();
+    loadBlockchainData();
+  }, []);
+
+  useEffect(() => {
+    if (tetherTokenContract) {
+      const loadBalance = async () => {
+        let balance = await tetherTokenContract.methods
+          .balanceOf(account)
+          .call();
+        console.log("balance response: " + balance);
+        setTetherBalance(balance);
+        console.log(" tethertoken contract: ", tetherTokenContract);
+      };
+      loadBalance();
     }
-    const web3 = new Web3(window.ethereum);
-    setWeb3(web3);
+  }, [tetherTokenContract, account]);
 
-    const web3Accounts = await web3.eth.getAccounts();
-    console.log(web3Accounts);
-    setAccount(web3Accounts[0]);
-  };
-
-  const loadBlockchainData = async () => {
-    const networkId = await web3.eth.net.getId();
-    const tetherNetworkData = TetherTokenAbi.networks[networkId];
-    console.log("token network ID: ", networkId);
-
-    //load contracts
-    if (tetherNetworkData) {
-      const tetherContract = new web3.eth.Contract(
-        TetherTokenAbi,
-        tetherNetworkData.address
-      );
-
-      setTetherTokenContract(tetherContract);
-      let tetherBalance = await tetherTokenContract.methods
-        .balanceOf(account)
-        .call();
-
-      setTetherBalance(tetherBalance);
-    } else {
-      window.alert(
-        "Error - Tether contract not deployed - no network detected"
-      );
-    }
-  };
-
-  // const checkWalletIsConnected = async () => {};
+  const checkWalletIsConnected = async () => {};
 
   const connectWalletHandler = async () => {};
 
   const connectWalletButton = async () => {};
-
-  useEffect(() => {
-    (async () => {
-      await loadWeb3();
-    })();
-
-    return () => {};
-  }, []);
 
   const navBar = () => {
     const titleString = "\t\t DAPP Yield Farming Decentralized Banking";
